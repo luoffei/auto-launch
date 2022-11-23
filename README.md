@@ -95,7 +95,29 @@ use auto_launch::AutoLaunch;
 fn main() {
     let app_name = "the-app";
     let app_path = "C:\\path\\to\\the-app.exe";
-    let auto = AutoLaunch::new(app_name, app_path, &[] as &[&str]);
+    let elevate_privileges = false;
+    let auto = AutoLaunch::new(app_name, app_path, &[] as &[&str], elevate_privileges);
+
+    // enable the auto launch
+    auto.enable().is_ok();
+    auto.is_enabled().unwrap();
+
+    // disable the auto launch
+    auto.disable().is_ok();
+    auto.is_enabled().unwrap();
+}
+```
+
+if the program requires elevate privileges, it will add a registry entry under `\HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run`.
+
+```rust
+use auto_launch::AutoLaunch;
+
+fn main() {
+    let app_name = "the-app";
+    let app_path = "C:\\path\\to\\the-app.exe";
+    let elevate_privileges = true;
+    let auto = AutoLaunch::new(app_name, app_path, &[] as &[&str], elevate_privileges);
 
     // enable the auto launch
     auto.enable().is_ok();

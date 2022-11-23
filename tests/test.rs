@@ -154,7 +154,15 @@ mod unit_test {
         let args = &["--minimized"];
         let app_path = app_path.as_str();
 
-        let auto = AutoLaunch::new(app_name, app_path, args);
+        let auto = AutoLaunch::new(app_name, app_path, args, false);
+
+        assert_eq!(auto.get_app_name(), app_name);
+        assert!(auto.enable().is_ok());
+        assert!(auto.is_enabled().unwrap());
+        assert!(auto.disable().is_ok());
+        assert!(!auto.is_enabled().unwrap());
+
+        let auto = AutoLaunch::new(app_name, app_path, args, true);
 
         assert_eq!(auto.get_app_name(), app_name);
         assert!(auto.enable().is_ok());

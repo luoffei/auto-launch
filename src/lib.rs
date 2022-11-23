@@ -192,6 +192,10 @@ pub struct AutoLaunch {
     /// Whether use Launch Agent for implement or use AppleScript
     pub(crate) use_launch_agent: bool,
 
+    #[cfg(target_os = "windows")]
+    /// Windows applications require elevate privilege.
+    pub(crate) elevate_privileges: bool,
+
     /// Args passed to the binary on startup
     pub(crate) args: Vec<String>,
 }
@@ -267,6 +271,8 @@ pub struct AutoLaunchBuilder {
     pub use_launch_agent: bool,
 
     pub args: Option<Vec<String>>,
+
+    pub elevate_privileges: bool,
 }
 
 impl AutoLaunchBuilder {
@@ -290,6 +296,13 @@ impl AutoLaunchBuilder {
     /// This setting only works on macOS
     pub fn set_use_launch_agent(&mut self, use_launch_agent: bool) -> &mut Self {
         self.use_launch_agent = use_launch_agent;
+        self
+    }
+
+    /// Set the `elevate_privileges`
+    /// This setting only works on windows
+    pub fn set_elevate_privileges(&mut self, elevate_privileges: bool) -> &mut Self {
+        self.elevate_privileges = elevate_privileges;
         self
     }
 
@@ -324,7 +337,7 @@ impl AutoLaunchBuilder {
             &args,
         ));
         #[cfg(target_os = "windows")]
-        return Ok(AutoLaunch::new(&app_name, &app_path, &args));
+        return Ok(AutoLaunch::new(&app_name, &app_path, &args, self.elevate_privileges));
 
         #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
         return Err(Error::UnsupportedOS);
